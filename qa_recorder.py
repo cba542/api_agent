@@ -11,23 +11,28 @@ except ImportError:
     from config import API_KEY, API_BASE, MODEL_NAME
 
 class QARecorder:
-    def __init__(self, api_key, api_base, model_name="gpt-3.5-turbo", excel_path="qa_records.xlsx"):
+    def __init__(self, api_key, api_base, model_name="gpt-3.5-turbo", output_dir="output"):
         """
         初始化 QA 記錄器
         :param api_key: OpenAI API 金鑰
         :param api_base: API 基礎 URL
         :param model_name: AI 模型名稱
-        :param excel_path: Excel 文件路徑
+        :param output_dir: 輸出目錄
         """
         self.client = openai.OpenAI(
             api_key=api_key,
             base_url=api_base,
-            timeout=60  # 增加超時時間
+            timeout=60
         )
         self.model_name = model_name
-        self.excel_path = excel_path
-        # 設定 HTML 文件路徑
-        self.html_path = excel_path.rsplit('.', 1)[0] + '.html'
+        
+        # 確保輸出目錄存在
+        self.output_dir = output_dir
+        os.makedirs(self.output_dir, exist_ok=True)
+        
+        # 設定輸出文件路徑
+        self.excel_path = os.path.join(self.output_dir, "qa_records.xlsx")
+        self.html_path = os.path.join(self.output_dir, "qa_records.html")
 
     def ask_question(self, question):
         """

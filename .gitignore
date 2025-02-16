@@ -1,0 +1,15 @@
+# 忽略本地配置文件
+config_local.py
+
+# 忽略 Python 相關文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python 
+*.xlsx
+*.html
+*.txt
+
+# 忽略 output 目錄
+output/

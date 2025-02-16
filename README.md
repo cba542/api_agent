@@ -62,24 +62,71 @@ graph TD
     style P fill:#fcc,stroke:#333
 ```
 ## Installation (安裝)
+### Prerequisites (環境需求)
+- Python 3.x
+- pip (Python 套件管理器)
 
 ## Setup (設置):
+1. 複製專案到本地：
+```bash
+git clone https://github.com/yourusername/qa_recorder.git
+cd qa_recorder
+```
+
+2. 複製 config.py 為 config_local.py
+```bash
+cp config.py config_local.py
+```
+
+3. 在 config_local.py 中填入你的實際配置：
+```python
+API_KEY = "your-api-key-here"  # 例如: "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+API_BASE = "your-api-base-here"  # 例如: "https://api.siliconflow.cn/v1"
+MODEL_NAME = "your-model-name-here"  # 例如: "deepseek-ai/DeepSeek-V3"
+```
+
+4. 安裝必要的 Python 套件：
+```bash
+pip install openai pandas openpyxl
+```
 
 ## Usage (使用方式):
-Run the main script to start the application:
-```
-python main.py
+執行主程式：
+```bash
+python qa_recorder.py
 ```
 
-Upon running, the main menu will be displayed:
+選擇操作模式：
+1. 手動輸入問題：直接輸入單一問題
+2. 讀取文本文件：從 input_question.txt 批量讀取問題
+3. 結束程序
 
-* Option 1 (手動輸入問題): Manually enter a question.
-* Option 2 (讀取文本文件): Load questions from a text file.
-* Option 3 (結束程序): Exit the application.
+### 批量處理模式
+如需使用批量處理模式，請建立 input_question.txt 文件：
+```text
+問題1
+問題2
+問題3
+```
 
 ## Project Structure (專案結構):
-* main.py: Main script to launch the application.
-* qa_recorder.py: Contains the QARecorder class and associated methods.
-* utils.py: Utility functions for file handling, error checking, etc.
-* reports/: Directory for saving generated Excel and HTML reports.
-* requirements.txt: List of Python packages required for the project.
+```
+qa_recorder/
+├── qa_recorder.py     # 主程式
+├── config.py          # 配置模板
+├── config_local.py    # 本地配置（需自行建立）
+├── .gitignore         # Git 忽略檔案設定
+├── README.md          # 專案說明文件
+├── input_question.txt # 批量問題輸入檔案（可選）
+└── output/           # 輸出目錄
+    ├── qa_records.xlsx # Excel 格式記錄
+    └── qa_records.html # HTML 格式報告
+```
+
+## Notes (注意事項)
+- 請確保 config_local.py 已加入 .gitignore 以保護 API 金鑰
+- 所有文字檔案請使用 UTF-8 編碼
+- HTML 報告會在每次新增問答時自動更新
+
+## License (授權)
+MIT License
