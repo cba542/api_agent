@@ -22,9 +22,10 @@ A user-friendly main menu allows selection between input methods and program ter
 
 ## Flow Diagram (流程圖)
 Below is the Mermaid diagram that illustrates the system workflow:
+![image](https://github.com/cba542/api_agent/blob/main/Test_flow.png)
+
 ### mermaid
 ```
-graph TD
 graph TD
     A[開始  Start ] --> B[初始化QARecorder  Initialize QARecorder ]
     B --> C{顯示主選單<br/> Display Main Menu }
