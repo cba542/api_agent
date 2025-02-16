@@ -11,13 +11,14 @@ except ImportError:
     from config import API_KEY, API_BASE, MODEL_NAME
 
 class QARecorder:
-    def __init__(self, api_key, api_base, model_name="gpt-3.5-turbo", output_dir="output"):
+    def __init__(self, api_key, api_base, model_name="gpt-3.5-turbo", output_dir="output", debug_mode=False):
         """
         初始化 QA 記錄器
         :param api_key: OpenAI API 金鑰
         :param api_base: API 基礎 URL
         :param model_name: AI 模型名稱
         :param output_dir: 輸出目錄
+        :param debug_mode: 是否啟用除錯模式
         """
         self.client = openai.OpenAI(
             api_key=api_key,
@@ -25,6 +26,7 @@ class QARecorder:
             timeout=60
         )
         self.model_name = model_name
+        self.debug_mode = debug_mode
         
         # 確保輸出目錄存在
         self.output_dir = output_dir
@@ -40,6 +42,10 @@ class QARecorder:
         :param question: 問題內容
         :return: AI 的回答
         """
+        # 如果是除錯模式，直接返回問題內容
+        if self.debug_mode:
+            return f"收到的問題是: \"{question}\" (This is debug mode)"
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model_name,
@@ -51,7 +57,7 @@ class QARecorder:
             )
             return response.choices[0].message.content
         except Exception as e:
-            print(f"詳細錯誤信息: {str(e)}")  # 添加詳細錯誤信息輸出
+            print(f"詳細錯誤信息: {str(e)}")
             return f"錯誤：{str(e)}"
 
     def save_to_excel(self, question, answer):
@@ -154,18 +160,57 @@ def main():
     recorder = QARecorder(API_KEY, API_BASE, MODEL_NAME)
 
     while True:
-        print("\n1. 輸入問題")
+        print("\n=== 主選單 ===")
+        print("1. 輸入問題")
         print("2. 從文本文件讀取問題")
         print("3. 退出")
-        choice = input("請選擇操作 (1-3): ")
+        print("4. 進入除錯模式")
+        
+        choice = input("請選擇操作 (1-4): ")
 
-        if choice == "1":
+        if choice == "4":
+            print("\n=== 除錯模式 ===")
+            debug_recorder = QARecorder(API_KEY, API_BASE, MODEL_NAME, debug_mode=True)
+            
+            while True:
+                print("\n【目前處於除錯模式】")
+                print("1. 輸入問題")
+                print("2. 從文本文件讀取問題")
+                print("3. 返回主選單")
+                
+                debug_choice = input("請選擇操作 (1-3): ")
+                
+                if debug_choice == "1":
+                    question = input("請輸入您的問題: ")
+                    answer = debug_recorder.process_input(question)
+                    print(f"\n回答: {answer}")
+
+                elif debug_choice == "2":
+                    file_path = os.path.join(os.path.dirname(__file__), "input_question.txt")
+                    try:
+                        if not os.path.exists(file_path):
+                            print(f"錯誤：找不到文件 {file_path}")
+                            print("請確保在程式同目錄下存在 input_question.txt 文件")
+                            continue
+                            
+                        process_text_file(file_path, debug_recorder)
+                        print("文件處理完成！")
+                    except Exception as e:
+                        print(f"處理文件時發生錯誤: {str(e)}")
+
+                elif debug_choice == "3":
+                    print("返回主選單")
+                    break
+
+                else:
+                    print("無效的選擇，請重試")
+
+        elif choice == "1":
             question = input("請輸入您的問題: ")
             answer = recorder.process_input(question)
             print(f"\n回答: {answer}")
 
         elif choice == "2":
-            # 使用當前腳本所在目錄的 input_question.txt
             file_path = os.path.join(os.path.dirname(__file__), "input_question.txt")
             try:
                 if not os.path.exists(file_path):
