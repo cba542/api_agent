@@ -1,21 +1,26 @@
 # QARecorder Project (QARecorder 專案)
 ## Overview (概述)
 This project is designed to provide a simple command-line based question-answering system that leverages the OpenAI API to generate answers. Users have two input methods: manually entering questions or reading questions from a text file. The system processes the questions, retrieves answers via the API, and then saves the results into an Excel file along with generating an HTML report.
+
 這個專案旨在提供一個簡單的命令列問題回答系統，利用 OpenAI API 產生答案。使用者可以透過兩種方式輸入問題：手動輸入或從文本文件讀取。系統處理問題後，將透過 API 取得答案，並保存到 Excel 文件，同時生成 HTML 報告。
 
 ## Features (功能)
 Manual Question Input (手動輸入問題):
 Users can directly enter a question via the command line.
 使用者可直接在命令列輸入問題。
+
 File-based Input (文件輸入):
 Questions can be read from a text file with error handling if the file is missing.
 系統能夠從文本文件讀取問題，並針對文件不存在的狀況進行錯誤處理。
+
 API Integration (API 整合):
 The system calls the OpenAI API to process and answer the questions.
 系統透過呼叫 OpenAI API 來處理與回答問題。
+
 Report Generation (報告生成):
 Answers are saved in an Excel file and an HTML report is generated for easy review.
 回答結果將保存於 Excel 文件中，並生成 HTML 報告以便檢視。
+
 Main Menu Navigation (主選單介面):
 A user-friendly main menu allows selection between input methods and program termination.
 友善的主選單介面讓使用者可以在輸入方式與程式結束之間切換。
