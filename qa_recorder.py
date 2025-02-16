@@ -26,6 +26,8 @@ class QARecorder:
         )
         self.model_name = model_name
         self.excel_path = excel_path
+        # 設定 HTML 文件路徑
+        self.html_path = excel_path.rsplit('.', 1)[0] + '.html'
 
     def ask_question(self, question):
         """
@@ -49,7 +51,7 @@ class QARecorder:
 
     def save_to_excel(self, question, answer):
         """
-        將問答記錄保存到 Excel
+        將問答記錄保存到 Excel 和 HTML
         :param question: 問題
         :param answer: 回答
         """
@@ -70,6 +72,55 @@ class QARecorder:
 
         # 保存到 Excel
         updated_df.to_excel(self.excel_path, index=False)
+        
+        # 生成 HTML 文件
+        css_style = """
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 20px; 
+            }
+            table { 
+                border-collapse: collapse; 
+                width: 100%; 
+            }
+            th, td { 
+                padding: 12px; 
+                text-align: left; 
+                border: 1px solid #ddd; 
+            }
+            th { 
+                background-color: #4CAF50; 
+                color: white; 
+            }
+            tr:nth-child(even) { 
+                background-color: #f2f2f2; 
+            }
+            tr:hover { 
+                background-color: #ddd; 
+            }
+            .qa-container { 
+                margin-bottom: 20px; 
+            }
+        """
+
+        html_content = f"""
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                {css_style}
+            </style>
+        </head>
+        <body>
+            <h1>QA Records</h1>
+            {updated_df.to_html(index=False, classes='qa-table', escape=False)}
+        </body>
+        </html>
+        """
+        
+        # 保存 HTML 文件
+        with open(self.html_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
 
     def process_input(self, input_text):
         """
