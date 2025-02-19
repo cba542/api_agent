@@ -142,19 +142,24 @@ class QARecorder:
         self.save_to_excel(input_text, answer)
         return answer
 
-def process_text_file(file_path, recorder):
-    """
-    處理文本文件中的問題
-    :param file_path: 文本文件路徑
-    :param recorder: QARecorder 實例
-    """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        questions = file.readlines()
-    
-    for question in questions:
-        question = question.strip()
-        if question:  # 確保不是空行
-            recorder.process_input(question)
+    def process_text_file(self, file_path):
+        """
+        處理文本文件中的問題
+        格式：使用 --- 作為問題分隔符，# 開頭的行作為問題標題
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+                questions = content.split('---')
+                
+                for question in questions:
+                    question = question.strip()
+                    if question:  # 確保不是空白問題
+                        self.process_input(question)
+            return True
+        except Exception as e:
+            print(f"處理文件時發生錯誤: {str(e)}")
+            return False
 
 def main():
     recorder = QARecorder(API_KEY, API_BASE, MODEL_NAME)
@@ -186,17 +191,14 @@ def main():
                     print(f"\n回答: {answer}")
 
                 elif debug_choice == "2":
-                    file_path = os.path.join(os.path.dirname(__file__), "input_question.txt")
-                    try:
-                        if not os.path.exists(file_path):
-                            print(f"錯誤：找不到文件 {file_path}")
-                            print("請確保在程式同目錄下存在 input_question.txt 文件")
-                            continue
-                            
-                        process_text_file(file_path, debug_recorder)
-                        print("文件處理完成！")
-                    except Exception as e:
-                        print(f"處理文件時發生錯誤: {str(e)}")
+                    file_path = os.path.join(os.path.dirname(__file__), "input_questions.txt")
+                    if not os.path.exists(file_path):
+                        print(f"錯誤：找不到文件 {file_path}")
+                        print("請確保文件存在並使用正確的格式")
+                        continue
+
+                    debug_recorder.process_text_file(file_path)
+                    print("文件處理完成！")
 
                 elif debug_choice == "3":
                     print("返回主選單")
@@ -211,17 +213,14 @@ def main():
             print(f"\n回答: {answer}")
 
         elif choice == "2":
-            file_path = os.path.join(os.path.dirname(__file__), "input_question.txt")
-            try:
-                if not os.path.exists(file_path):
-                    print(f"錯誤：找不到文件 {file_path}")
-                    print("請確保在程式同目錄下存在 input_question.txt 文件")
-                    continue
-                    
-                process_text_file(file_path, recorder)
-                print("文件處理完成！")
-            except Exception as e:
-                print(f"處理文件時發生錯誤: {str(e)}")
+            file_path = os.path.join(os.path.dirname(__file__), "input_questions.txt")
+            if not os.path.exists(file_path):
+                print(f"錯誤：找不到文件 {file_path}")
+                print("請確保文件存在並使用正確的格式")
+                continue
+
+            recorder.process_text_file(file_path)
+            print("文件處理完成！")
 
         elif choice == "3":
             print("程序結束")

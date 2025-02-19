@@ -98,16 +98,41 @@ python qa_recorder.py
 
 選擇操作模式：
 1. 手動輸入問題：直接輸入單一問題
-2. 讀取文本文件：從 input_question.txt 批量讀取問題
+2. 讀取文本文件：從 input_questions.txt 批量讀取問題
 3. 結束程序
 
 ### 批量處理模式
-如需使用批量處理模式，請建立 input_question.txt 文件：
+系統使用文本文件格式 (input_questions.txt) 來批量處理問題：
+
+- 使用 "---" 作為問題分隔符
+- 每個問題可以包含多行內容
+- 支持標題和詳細描述
+
+範例格式：
 ```text
-問題1
-問題2
-問題3
+# 問題一：Python 文件處理
+請詳細說明如何使用 Python 處理文件，包含以下幾點：
+1. 文件的讀寫操作
+2. 常見的文件處理方法
+3. 錯誤處理機制
+---
+# 問題二：機器學習概述
+什麼是機器學習？
+這個技術有什麼應用？
+為什麼現在這麼流行？
+---
+# 問題三：API 介紹
+請解釋 API 是什麼：
+1. API 的定義
+2. 常見用途
+3. 優缺點
 ```
+
+注意：
+- 每個問題之間使用 "---" 分隔
+- 可以使用 # 開頭的行作為問題標題（可選）
+- 問題內容可以包含多行文字
+- 支持項目符號和編號列表
 
 ## Project Structure (專案結構):
 ```
@@ -117,7 +142,7 @@ qa_recorder/
 ├── config_local.py    # 本地配置（需自行建立）
 ├── .gitignore         # Git 忽略檔案設定
 ├── README.md          # 專案說明文件
-├── input_question.txt # 批量問題輸入檔案（可選）
+├── input_questions.txt # 批量問題輸入檔案
 └── output/           # 輸出目錄
     ├── qa_records.xlsx # Excel 格式記錄
     └── qa_records.html # HTML 格式報告
