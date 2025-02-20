@@ -67,24 +67,66 @@ class QARecorder:
         :param answer: 回答
         """
         current_date = datetime.now().strftime("%Y/%m/%d")
-        new_record = pd.DataFrame({
+        
+        # 為 Excel 準備純文字格式
+        excel_record = pd.DataFrame({
             'Date': [current_date],
-            'Question': [question],
-            'Result': [answer]
+            'Question': [question],  # 保持原始格式
+            'Result': [answer]       # 保持原始格式
         })
 
-        if os.path.exists(self.excel_path):
-            # 如果文件存在，讀取並附加新記錄
-            existing_df = pd.read_excel(self.excel_path)
-            updated_df = pd.concat([existing_df, new_record], ignore_index=True)
-        else:
-            # 如果文件不存在，創建新的 DataFrame
-            updated_df = new_record
+        # 為 HTML 準備格式化文字
+        html_question = question.replace('\n', '<br>')
+        html_answer = answer.replace('\n', '<br>')
+        
+        # 處理 Markdown 格式
+        html_answer = (html_answer
+            .replace('**', '<strong>')  # 開始粗體
+            .replace('**', '</strong>')  # 結束粗體
+            .replace('`', '<code>')  # 開始程式碼
+            .replace('`', '</code>')  # 結束程式碼
+            .replace('###', '<h3>')  # 開始標題
+            .replace('\n', '</h3>', 1)  # 結束標題（只替換第一個換行）
+        )
+        
+        # 處理程式碼區塊
+        if '```' in html_answer:
+            html_answer = html_answer.replace(
+                '```python', '<pre><code class="language-python">'
+            ).replace(
+                '```', '</code></pre>'
+            )
+
+        html_record = pd.DataFrame({
+            'Date': [current_date],
+            'Question': [html_question],
+            'Result': [html_answer]
+        })
 
         # 保存到 Excel
-        updated_df.to_excel(self.excel_path, index=False)
+        if os.path.exists(self.excel_path):
+            existing_df = pd.read_excel(self.excel_path)
+            updated_excel_df = pd.concat([existing_df, excel_record], ignore_index=True)
+        else:
+            updated_excel_df = excel_record
         
-        # 生成 HTML 文件
+        updated_excel_df.to_excel(self.excel_path, index=False)
+
+        # 生成 HTML
+        if os.path.exists(self.excel_path):
+            existing_df = pd.read_excel(self.excel_path)
+            # 將所有現有記錄也轉換為 HTML 格式
+            for i in range(len(existing_df)):
+                if i == len(existing_df) - 1:  # 跳過最後一筆（剛剛新增的）
+                    continue
+                existing_df.loc[i, 'Question'] = existing_df.loc[i, 'Question'].replace('\n', '<br>')
+                existing_df.loc[i, 'Result'] = existing_df.loc[i, 'Result'].replace('\n', '<br>')
+            
+            updated_html_df = pd.concat([existing_df, html_record], ignore_index=True)
+        else:
+            updated_html_df = html_record
+
+        # 更新 CSS 樣式
         css_style = """
             body { 
                 font-family: Arial, sans-serif; 
@@ -98,6 +140,7 @@ class QARecorder:
                 padding: 12px; 
                 text-align: left; 
                 border: 1px solid #ddd; 
+                vertical-align: top;
             }
             th { 
                 background-color: #4CAF50; 
@@ -112,6 +155,26 @@ class QARecorder:
             .qa-container { 
                 margin-bottom: 20px; 
             }
+            pre {
+                background-color: #f5f5f5;
+                padding: 10px;
+                border-radius: 4px;
+                overflow-x: auto;
+            }
+            code {
+                font-family: Consolas, Monaco, 'Courier New', monospace;
+                background-color: #f5f5f5;
+                padding: 2px 4px;
+                border-radius: 3px;
+            }
+            h3 {
+                color: #2c3e50;
+                margin-top: 20px;
+                margin-bottom: 10px;
+            }
+            strong {
+                color: #2c3e50;
+            }
         """
 
         html_content = f"""
@@ -124,7 +187,7 @@ class QARecorder:
         </head>
         <body>
             <h1>QA Records</h1>
-            {updated_df.to_html(index=False, classes='qa-table', escape=False)}
+            {updated_html_df.to_html(index=False, classes='qa-table', escape=False)}
         </body>
         </html>
         """
