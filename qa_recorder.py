@@ -114,15 +114,14 @@ class QARecorder:
 
         # 生成 HTML
         if os.path.exists(self.excel_path):
+            # 讀取所有現有記錄並轉換為 HTML 格式
             existing_df = pd.read_excel(self.excel_path)
-            # 將所有現有記錄也轉換為 HTML 格式
             for i in range(len(existing_df)):
-                if i == len(existing_df) - 1:  # 跳過最後一筆（剛剛新增的）
-                    continue
                 existing_df.loc[i, 'Question'] = existing_df.loc[i, 'Question'].replace('\n', '<br>')
                 existing_df.loc[i, 'Result'] = existing_df.loc[i, 'Result'].replace('\n', '<br>')
             
-            updated_html_df = pd.concat([existing_df, html_record], ignore_index=True)
+            # 不需要再次添加新記錄，因為它已經在 existing_df 中了
+            updated_html_df = existing_df
         else:
             updated_html_df = html_record
 
@@ -224,6 +223,14 @@ class QARecorder:
             print(f"處理文件時發生錯誤: {str(e)}")
             return False
 
+    def open_html_report(self):
+        html_path = os.path.join('output', 'qa_records.html')
+        if os.path.exists(html_path):
+            import webbrowser
+            webbrowser.open('file://' + os.path.abspath(html_path))
+        else:
+            print("HTML 報告檔案不存在！")
+
 def main():
     recorder = QARecorder(API_KEY, API_BASE, MODEL_NAME)
 
@@ -231,12 +238,13 @@ def main():
         print("\n=== 主選單 ===")
         print("1. 輸入問題")
         print("2. 從文本文件讀取問題")
-        print("3. 退出")
-        print("4. 進入除錯模式")
+        print("3. 進入除錯模式")
+        print("4. 開啟問答記錄報告")
+        print("5. 退出")
         
-        choice = input("請選擇操作 (1-4): ")
+        choice = input("請選擇操作 (1-6): ")
 
-        if choice == "4":
+        if choice == "3":
             print("\n=== 除錯模式 ===")
             debug_recorder = QARecorder(API_KEY, API_BASE, MODEL_NAME, debug_mode=True)
             
@@ -285,7 +293,10 @@ def main():
             recorder.process_text_file(file_path)
             print("文件處理完成！")
 
-        elif choice == "3":
+        elif choice == "4":
+            recorder.open_html_report()
+
+        elif choice == "5":
             print("程序結束")
             break
 
